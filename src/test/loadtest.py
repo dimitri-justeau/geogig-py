@@ -26,7 +26,7 @@ class GeogigLoadTest(unittest.TestCase):
         path = os.path.join(os.path.dirname(__file__), "data", "shp", "elevation", "elevation.shp")
         repo.importshp(path)
         repo.add()   
-        for i in xrange(NUMPOINTS):
+        for i in range(NUMPOINTS):
             feature = "elevation/" + str(i+1);            
             message = "message " + str(i+1)
             repo.commit(message, [feature])

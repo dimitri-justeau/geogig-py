@@ -1,20 +1,20 @@
 import re
-from commitish import Commitish
-from tag import Tag
-import geogig
-from geogigexception import GeoGigException
-from feature import Feature
-from tree import Tree
-from utils import mkdir
-from py4jconnector import Py4JCLIConnector
-from geogigserverconnector import GeoGigServerConnector
+from geogigpy.commitish import Commitish
+from geogigpy.tag import Tag
+from geogigpy import geogig
+from geogigpy.geogigexception import GeoGigException
+from geogigpy.feature import Feature
+from geogigpy.tree import Tree
+from geogigpy.utils import mkdir
+from geogigpy.py4jconnector import Py4JCLIConnector
+from geogigpy.geogigserverconnector import GeoGigServerConnector
 import tempfile
 import datetime
 import re
 
 def _resolveref(ref):
     '''
-    Tries to resolve the pased object into a string representing a commit reference 
+    Tries to resolve the pased object into a string representing a commit reference
     (a SHA-1, branch name, or something like HEAD~1)
     This should be called by all commands using references, so they can accept both
     strings and Commitish objects indistinctly
@@ -23,7 +23,7 @@ def _resolveref(ref):
         return None
     if isinstance(ref, Commitish):
         return ref.ref
-    elif isinstance(ref, basestring):
+    elif isinstance(ref, str):
         return ref
     else:
         return str(ref)
@@ -37,9 +37,9 @@ class Repository(object):
     def __init__(self, url, connector = None, init = False, initParams = None):
         '''
         url: The url of the repository. Only file paths are supported so far. Remote repos are not supported
-        
+
         connector: the connector to use to communicate with the repository
-        
+
         init: True if the repository should be initialized
         '''
         self.url = url
@@ -47,14 +47,14 @@ class Repository(object):
         if init:
             try:
                 mkdir(url)
-            except Exception, e:
+            except Exception as e:
                 raise GeoGigException("Cannot create repository folder.\nCheck that path is correct and you have permission")
 
         self.connector.setRepository(self)
         try:
             self.connector.checkisrepo()
             isAlreadyRepo = True
-        except GeoGigException, e:
+        except GeoGigException as e:
             isAlreadyRepo = False
 
         if init:
@@ -70,12 +70,12 @@ class Repository(object):
     def newrepofromclone(url, path, connector = None, username = None, password = None):
         '''
         Clones a given repository into a local folder and returns a repository object representing it
-        
+
         url: the url of the repo to clone
-        
+
         path: the path to clone the repo into
-        
-        connector: the connector to use to communicate with the repository        
+
+        connector: the connector to use to communicate with the repository
         '''
         connector = Py4JCLIConnector() if connector is None else connector
         connector.clone(url, path, username, password)
@@ -130,7 +130,7 @@ class Repository(object):
         '''
         Returns a tuple with number of (ahead, behind) commits between this repo and a remote
         It uses the passed branch or, if not passed, the current branch
-        If the repository is headless, or if not remote is defined, it will throw an exception 
+        If the repository is headless, or if not remote is defined, it will throw an exception
         It uses the "origin" remote if it exists, otherwise it uses the first remote available.
         If the remote requires authentication, a tuple of (username,password) must be passed
         in the credentials parameter
@@ -144,8 +144,8 @@ class Repository(object):
                 remote = remotes["origin"]
                 remotename = "origin"
             else:
-                remotename = remotes.keys()[0]
-                remote = remotes.values()[0]
+                remotename = list(remotes.keys())[0]
+                remote = list(remotes.values())[0]
         else:
             raise GeoGigException("No remotes defined")
 
@@ -232,7 +232,7 @@ class Repository(object):
     def tags(self):
         '''Returns a dict with tag names as keys and tag objects as values'''
         tags = self.connector.tags()
-        tags = {k:Tag(self, v, k) for k, v in tags.iteritems()}
+        tags = {k:Tag(self, v, k) for k, v in tags.items()}
         return tags
 
     def clone(self, path):
@@ -274,7 +274,7 @@ class Repository(object):
     def treediff(self, path, refa = geogig.HEAD, refb = geogig.WORK_HEAD):
         '''Returns a tuple attributes, features with a description of features changed between the specified refs
         Attributes is a dict with attribute names as keys and the description of the attribute as value
-        Features is a list, with each element being another list representing a feature and the changes 
+        Features is a list, with each element being another list representing a feature and the changes
         in it between the two specifed versions.
         The length of this list is the same as the one of attributes dictionary
         The value for an attribute is a tuple of (change_type, old value, new value) in case the change for the
@@ -295,11 +295,11 @@ class Repository(object):
         return self.diff(geogig.HEAD, geogig.WORK_HEAD);
 
     def conflicts(self):
-        '''Returns a dict of tuples. Keys are paths, values are tuples with the 3 versions 
+        '''Returns a dict of tuples. Keys are paths, values are tuples with the 3 versions
         defining a conflict, as Feature objects'''
         conflicts = {}
         _conflicts = self.connector.conflicts()
-        for path, c in _conflicts.iteritems():
+        for path, c in _conflicts.items():
             c = tuple(Feature(self, ref, path) for ref in c)
             conflicts[path] = c
         return conflicts
@@ -377,7 +377,7 @@ class Repository(object):
 
     def featuredata(self, ref, path):
         '''
-        Returns the attributes of a given feature, as a dict with attributes 
+        Returns the attributes of a given feature, as a dict with attributes
         names as keys and tuples of (attribute_value, attribute_type_name) as values.
         Values are converted to appropriate types when possible, otherwise they are stored
         as the string representation of the attribute
@@ -395,9 +395,9 @@ class Repository(object):
         '''
         Returns all versions os a given feature.
         It returns a dict with Commit objects as keys, and feature data for the corresponding
-        commit as values. Feature data is another dict with attributes 
+        commit as values. Feature data is another dict with attributes
         names as keys and tuples of (attribute_value, attribute_type_name) as values.
-        Values are converted to appropriate types when possible, otherwise they are stored 
+        Values are converted to appropriate types when possible, otherwise they are stored
         as the string representation of the attribute
         '''
         entries = self.log(geogig.HEAD, path = path)
@@ -450,7 +450,7 @@ class Repository(object):
         self.connector.importsl(database, table, add, dest)
 
     def exportdiffs(self, commit1, commit2, path, filepath, old = False, overwrite = False):
-        '''Exports the differences in a given tree between to commits, creating a shapefile 
+        '''Exports the differences in a given tree between to commits, creating a shapefile
         with the changed features corresponding to the newest of them, or the oldest if old = False'''
         self.connector.exportdiffs(_resolveref(commit1), _resolveref(commit2), path, filepath, old, overwrite)
 
@@ -459,9 +459,9 @@ class Repository(object):
         Inserts a feature to the working tree.
 
         The attributes are passed in a dict with attribute names as keys and attribute values as values.
-        There must be one and only one geometry attribute, with a Geometry object.  
-        
-        It will overwrite any feature in the same path, so this can be used to add a new feature or to 
+        There must be one and only one geometry attribute, with a Geometry object.
+
+        It will overwrite any feature in the same path, so this can be used to add a new feature or to
         modify an existing one
         '''
         self.connector.insertfeatures({path : attributes})
@@ -470,11 +470,11 @@ class Repository(object):
         '''
         Inserts a set of features into the working tree.
 
-        Features are passed in a dict with paths as keys and attributes as values 
+        Features are passed in a dict with paths as keys and attributes as values
         The attributes for each feature are passed in a dict with attribute names as keys and attribute values as values.
         There must be one an only one geometry attribute, with a Geometry object.
-        
-        It will overwrite any feature in the same path, so this can be used to add new features or to 
+
+        It will overwrite any feature in the same path, so this can be used to add new features or to
         modify existing ones
         '''
         self.connector.insertfeatures(features)
@@ -558,7 +558,7 @@ class Repository(object):
 
 
     def _mapping(self, mappingorfile):
-        if isinstance(mappingorfile, basestring):
+        if isinstance(mappingorfile, str):
             return mappingorfile
         else:
             try:
@@ -571,7 +571,7 @@ class Repository(object):
 
     def importosm(self, osmfile, add = False, mappingorfile = None):
         '''
-        Imports an osm file.        
+        Imports an osm file.
         Accepts a mapping object or a string with the path to a mapping file to define an import mapping
         '''
         mappingfile = None
@@ -582,7 +582,7 @@ class Repository(object):
     def exportosm(self, osmfile, ref = None, bbox = None):
         '''
         Exports the OSM data in the repository to an OSM XML file
-        A bounding box can be passed to be used as a filter. 
+        A bounding box can be passed to be used as a filter.
         It is passed as a tuple of 4 elements containing the boundary coordinates in the form (S, W, N, E)
         '''
         self.connector.exportosm(osmfile, _resolveref(ref), bbox)
@@ -615,7 +615,7 @@ class Repository(object):
     def pull(self, remote = geogig.ORIGIN, branch = None, rebase = False):
         '''
         Pulls from the specified remote and specified branch.
-        If no branch is provided, it will use the name of the current branch, unless the repo is headless. 
+        If no branch is provided, it will use the name of the current branch, unless the repo is headless.
         In that case, and exception will be raised
         If rebase == True, it will do a rebase instead of a merge
         '''
@@ -627,10 +627,10 @@ class Repository(object):
 
     def push(self, remote, branch = None, all = False):
         '''
-        Pushes to the specified remote and specified branch. 
-        If no branch is provided, it will use the name of the current branch, unless the repo is headless.        
+        Pushes to the specified remote and specified branch.
+        If no branch is provided, it will use the name of the current branch, unless the repo is headless.
         In that case, and exception will be raised.
-        if all == True, it will push all branches and ignore the branch. 
+        if all == True, it will push all branches and ignore the branch.
         '''
         if branch is None and self.isdetached():
             raise GeoGigException("HEAD is detached. Cannot push")
