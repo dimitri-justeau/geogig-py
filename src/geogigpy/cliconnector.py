@@ -315,14 +315,14 @@ class CLIConnector(Connector):
     def deletetag(self, name):
         self.run(['tag', '-d', name])
 
-    def add(self, paths = []):
+    def add(self, paths=()):
         if paths:
             for path in paths:
                 self.run(['add', path])
         else:
             self.run(['add'])
 
-    def commit(self, message, paths = []):
+    def commit(self, message, paths=()):
         commands = ['commit', '-m']
         commands.append('"%s"' % message)
         commands.extend(paths)

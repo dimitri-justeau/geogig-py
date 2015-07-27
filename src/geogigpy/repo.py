@@ -339,15 +339,15 @@ class Repository(object):
         self.connector.solveconflicts(paths, version)
 
 
-    def add(self, paths = []):
+    def add(self, paths=()):
         '''Adds the passed paths to the staging area. If no paths are passed, it will add all the unstaged ones'''
         self.connector.add(paths)
 
-    def addandcommit(self, message, paths = []):
+    def addandcommit(self, message, paths=()):
         self.add(paths)
         return self.commit(message, paths)
 
-    def commit(self, message, paths = []):
+    def commit(self, message, paths=()):
         '''
         Creates a new commit with the changes in the specified paths.
         If no paths are passed, it will commit all staged features
@@ -619,7 +619,7 @@ class Repository(object):
         In that case, and exception will be raised
         If rebase == True, it will do a rebase instead of a merge
         '''
-        if branch == None and self.isdetached():
+        if branch is None and self.isdetached():
             raise GeoGigException("HEAD is detached. Cannot pull")
         branch = branch or self.head.ref
         self.connector.pull(remote, branch, rebase)
