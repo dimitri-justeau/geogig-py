@@ -1,6 +1,6 @@
 
 class Connector(object):
-    '''Base class for connector'''
+    """Base class for connector"""
 
     def setRepository(self, repo):
         self.repo = repo

@@ -94,15 +94,15 @@ class Feature(object):
             return False
 
     def blame(self):
-        '''
+        """
         Returns authorship information for this feature
         It is returned as a dict, with attribute names as keys.
         Values are tuples of (value, commitid, authorname)
-        '''
+        """
         return self.repo.blame(self.path)
 
     def versions(self):
-        '''
+        """
         Returns all versions of this feature.
         It returns a dict with Commit objects as keys,
         and feature data for the corresponding commit as values.
@@ -110,14 +110,14 @@ class Feature(object):
         and tuples of (attribute_value, attribute_type_name) as values.
         Values are converted to appropriate types when possible,
         otherwise they are stored as the string representation of the attribute
-        '''
+        """
         return self.repo.versions(self.path)
 
     def setascurrent(self):
-        '''
+        """
         Sets this version of the feature as the current one in the
         working tree and index
-        '''
+        """
         if self.exists():
             self.repo.updatepathtoref(self.ref, [self.path])
         else:
@@ -126,6 +126,3 @@ class Feature(object):
 
     def __str__(self):
         return self.ref + ":" + self.path
-
-
-

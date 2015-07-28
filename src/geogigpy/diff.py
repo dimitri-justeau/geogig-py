@@ -11,7 +11,7 @@ ATTRIBUTE_DIFF_MODIFIED, ATTRIBUTE_DIFF_ADDED,\
 
 class Diffentry(object):
 
-    '''A difference between two references for a given path'''
+    """A difference between two references for a given path"""
 
     def __init__(self, repo, oldcommitref, newcommitref, oldref, newref, path):
         self.repo = repo
@@ -54,8 +54,3 @@ class Diffentry(object):
         else:
             return "%s %s (%s --> %s)" % (TYPE_MODIFIED, self.path,
                                           self.oldref, self.newref)
-
-
-
-
-

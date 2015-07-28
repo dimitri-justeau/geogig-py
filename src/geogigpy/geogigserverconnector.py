@@ -12,10 +12,10 @@ SHA_MATCHER = re.compile(r"\b([a-f0-9]{40})\b")
 
 
 class GeoGigServerConnector(Connector):
-    '''
+    """
     A connector that connects to a geogig repo through a
     geogig-server instance.
-    '''
+    """
 
     def __init__(self, credentials=None):
         Connector.__init__(self)

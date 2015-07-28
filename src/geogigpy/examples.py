@@ -7,11 +7,11 @@ from geogigpy.repo import Repository
 
 
 def squash_latest(repo, n, message=None):
-    '''
+    """
     Squashes the latest n commits into a single one.
     If a message is passed, it uses it for the resulting commit.
     Otherwise, it uses the messages from the squashed commits
-    '''
+    """
     if n < 1:
         raise Exception("Cannot squash less than 2 commits")
     log = repo.log()
@@ -24,12 +24,12 @@ def squash_latest(repo, n, message=None):
 
 
 def squash(repo, refa, refb, message=None):
-    '''
+    """
     Squashes all the commits between two given ones, 'refa' and 'refb'.
     Commits are passed as a string with the corresponding commit id
     If a message is passed, it uses it for the resulting commit.
     Otherwise, it uses the messages from the squashed commits
-    '''
+    """
     head = repo.head
 
     commita = Commit.fromref(repo, refa)
@@ -71,10 +71,10 @@ def squash(repo, refa, refb, message=None):
 
 
 def blame(repo):
-    '''
+    """
     Returns a dict with tree names ids as keys and the name of the last
     person to edit each tree as values
-    '''
+    """
     authors = {}
     for tree in repo.trees:
         path = tree.path
@@ -121,5 +121,3 @@ if __name__ == '__main__':
     print(len(log))
     print(log[0].message)
     print(log[1].message)
-
-

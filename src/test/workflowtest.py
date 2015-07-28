@@ -98,10 +98,3 @@ class GeogigWorkflowTest(unittest.TestCase):
         feature = cloneb.feature(geogig.HEAD, "landuse/1")
         attribs = feature.attributes
         self.assertEqual(attribs["LANDCOVER"], "urban")
-
-
-
-
-
-
-

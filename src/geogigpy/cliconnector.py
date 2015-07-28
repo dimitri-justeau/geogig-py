@@ -41,9 +41,9 @@ def _run(command, addcolor=True):
 
 
 class CLIConnector(Connector):
-    '''
+    """
     A connector that calls the CLI version of geogig and parses CLI output
-    '''
+    """
 
     def __init__(self):
         self.commandslog = []

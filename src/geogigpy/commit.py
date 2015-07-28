@@ -9,7 +9,7 @@ class Commit(Commitish):
 
     _commitcache = {}
 
-    ''' A geogig commit'''
+    """A geogig commit"""
 
     def __init__(self, repo, commitid, treeid, parents, message,
                  authorname, authordate, committername, committerdate):
@@ -26,10 +26,10 @@ class Commit(Commitish):
 
     @staticmethod
     def fromref(repo, ref):
-        '''
+        """
         Returns a Commit corresponding to a given id.
         ref is passed as a string.
-        '''
+        """
         if ref == NULL_ID:
             return Commitish(repo, NULL_ID)
         else:
@@ -41,40 +41,40 @@ class Commit(Commitish):
 
     @property
     def parents(self):
-        '''
+        """
         Returns a list of commits with commits representing the parents of
         this commit
-        '''
+        """
         commits = [self.fromref(self.repo, p) for p in self._parents]
         return commits
 
     @property
     def parent(self):
-        '''
+        """
         Returns the parent commit, assuming a linear history.
         It's similar to the tilde(~) operator
-        '''
+        """
         return self.parents[0]
 
     def diff(self, path=None):
-        '''
+        """
         Returns a list of DiffEntry with all changes introduced
         by this commitish
-        '''
+        """
         if self._diff is None:
             self._diff = self.repo.diff(self.parent.ref, self.ref, path)
         return self._diff
 
     def difftreestats(self):
-        '''
+        """
         Returns a dict with tree changes statistics for the passed refs. Keys
         are paths, values are tuples in the form (added, deleted, modified)
         corresponding to changes made to that path
-        '''
+        """
         return self.repo.difftreestats(self.parent.ref, self.ref)
 
     def humantext(self):
-        '''Returns a nice human-readable description of the commit'''
+        """Returns a nice human-readable description of the commit"""
         headid = self.repo.revparse(self.repo.head.ref)
         if headid == self.id:
             return "Current last commit"

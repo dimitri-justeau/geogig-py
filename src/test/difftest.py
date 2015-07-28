@@ -32,4 +32,3 @@ class GeogigDiffTest(unittest.TestCase):
         self.assertEqual("parks/5", new.path)
         attrs = new.attributes
         self.assertEqual(15246.59765625, attrs['area'])
-

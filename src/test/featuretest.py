@@ -96,4 +96,3 @@ class GeogigFeatureTest(unittest.TestCase):
         self.assertTrue("area" in attrs)
         self.assertTrue("perimeter" in attrs)
         self.assertFalse("the_geom" in attrs)
-

@@ -16,7 +16,7 @@ def mkdir(newdir):
 
 
 def prettydate(d):
-    '''Formats a utc date'''
+    """Formats a utc date"""
     diff = datetime.datetime.utcnow() - d
     s = ''
     secs = diff.seconds

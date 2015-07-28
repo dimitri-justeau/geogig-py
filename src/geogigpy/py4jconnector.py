@@ -1,13 +1,13 @@
-from py4j.java_gateway import JavaGateway, GatewayClient
 import logging
-from geogigpy.geogigexception import GeoGigException
-from geogigpy.cliconnector import CLIConnector
-import subprocess
 import os
 import time
 import gc
 import re
-import signal
+
+from py4j.java_gateway import JavaGateway, GatewayClient
+
+from geogigpy.geogigexception import GeoGigException
+from geogigpy.cliconnector import CLIConnector
 
 _proc = None
 _gateway = None
@@ -122,7 +122,7 @@ class Py4JConnectionException(Exception):
 
 
 class Py4JCLIConnector(CLIConnector):
-    ''' A connector that uses a Py4J gateway server to connect to geogig'''
+    """A connector that uses a Py4J gateway server to connect to geogig"""
 
     def __init__(self):
         self.commandslog = []
@@ -158,22 +158,17 @@ class Py4JCLIConnector(CLIConnector):
         return _runGateway(commands, self.repo.url)
 
     def setRepository(self, repo):
-        '''
+        """
         Sets the repository to use when later passing commands to this
         connector using the "run" method
-        '''
+        """
         self.repo = repo
 
     def checkIsAlive(self):
         _connect()
 
     def setGatewayPort(self, port):
-        '''
+        """
         Sets the port to use for connecting to the gateway.
-        '''
+        """
         setGatewayPort(port)
-
-
-
-
-

@@ -568,5 +568,3 @@ class GeogigRepositoryTest(unittest.TestCase):
         ahead, behind = repo.synced()
         self.assertEqual(1, ahead)
         self.assertEqual(0, behind)
-
-

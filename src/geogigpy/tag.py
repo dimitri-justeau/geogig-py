@@ -2,7 +2,7 @@ from geogigpy.commit import Commit
 
 
 class Tag(object):
-    '''An object representing a tag'''
+    """An object representing a tag"""
 
     ROOT = None
 
