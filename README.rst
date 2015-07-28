@@ -5,13 +5,16 @@ A Python library to use GeoGig.
 
 This library is designed to provide access to all GeoGig functionality, so it can be used to script tasks or as the base library for a GeoGig client.
 
+Python version: 2.7 or 3.x
+
+
 Installation
 -------------
 
 To install, use ``pip`` or ``easy_install``:
 
 ::
-	
+
 	$ pip install geogig-py
 
 or
@@ -24,8 +27,8 @@ For developers wanting to improve or modify ``geogig-py``, you should clone the 
 
 ::
 
-	$ git clone git://github.com/boundlessgeo/geogig-py.git 
-	$ cd geogig-py 
+	$ git clone git://github.com/boundlessgeo/geogig-py.git
+	$ cd geogig-py
 	$ python setup.py develop (virtualenv of your choice)
 
 
