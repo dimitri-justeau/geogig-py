@@ -1,3 +1,5 @@
+# coding: utf-8
+
 from geogigpy.commit import Commit
 
 

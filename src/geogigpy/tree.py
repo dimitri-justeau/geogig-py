@@ -1,3 +1,6 @@
+# coding: utf-8
+
+
 class Tree(object):
     """An object representing a tree path for a given commit"""
 

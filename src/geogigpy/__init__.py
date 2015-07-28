@@ -1,3 +1,5 @@
+# coding: utf-8
+
 from geogigpy.geogig import *
 from geogigpy.repo import Repository
 from geogigpy.commitish import Commitish

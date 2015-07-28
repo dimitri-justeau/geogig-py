@@ -1,3 +1,5 @@
+# coding: utf-8
+
 class Geometry(object):
 
     def __init__(self, geom, crs):

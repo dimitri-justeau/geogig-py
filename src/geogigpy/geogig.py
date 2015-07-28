@@ -1,3 +1,5 @@
+# coding: utf-8
+
 MASTER = 'master'
 HEAD = 'HEAD'
 WORK_HEAD = 'WORK_HEAD'

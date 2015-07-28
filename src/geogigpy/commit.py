@@ -1,6 +1,9 @@
-from geogigpy.commitish import Commitish
+# coding: utf-8
+
 import datetime
 import time
+
+from geogigpy.commitish import Commitish
 from geogigpy.geogig import NULL_ID
 from geogigpy.utils import prettydate
 

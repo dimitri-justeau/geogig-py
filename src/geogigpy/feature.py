@@ -1,3 +1,5 @@
+# coding: utf-8
+
 from geogigpy.geogigexception import GeoGigException
 from geogigpy.geometry import Geometry
 

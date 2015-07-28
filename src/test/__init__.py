@@ -1,4 +1,7 @@
+# coding: utf-8
+
 import unittest
+
 from test.treetest import GeogigTreeTest
 from test.testrepo import testRepo
 from test.repotest import GeogigRepositoryTest

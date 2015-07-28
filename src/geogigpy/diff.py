@@ -1,3 +1,5 @@
+# coding: utf-8
+
 from geogigpy.feature import Feature
 from geogigpy.geogig import NULL_ID
 
