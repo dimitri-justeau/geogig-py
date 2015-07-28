@@ -1,15 +1,18 @@
 import unittest
 import os
 import time
+
 from geogigpy.commit import Commit
 from test.testrepo import testRepo
+
 
 class GeogigCommitTest(unittest.TestCase):
 
     repo = testRepo()
 
     def getTempPath(self):
-        return os.path.join(os.path.dirname(__file__), "temp", str(time.time())).replace('\\', '/')
+        return os.path.join(os.path.dirname(__file__), "temp",
+                            str(time.time())).replace('\\', '/')
 
     def getClonedRepo(self):
         dst = self.getTempPath()

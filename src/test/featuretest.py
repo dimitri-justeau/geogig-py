@@ -1,19 +1,22 @@
 import unittest
 import os
-from geogigpy.repo import Repository
 import time
 import shutil
+
+from geogigpy.repo import Repository
 from geogigpy import geogig
 from geogigpy.feature import Feature
 from geogigpy.geometry import Geometry
 from test.testrepo import testRepo
+
 
 class GeogigFeatureTest(unittest.TestCase):
 
     repo = testRepo()
 
     def getTempPath(self):
-        return os.path.join(os.path.dirname(__file__), "temp", str(time.time())).replace('\\', '/')
+        return os.path.join(os.path.dirname(__file__), "temp",
+                            str(time.time())).replace('\\', '/')
 
     def getClonedRepo(self):
         src = self.repo.url
@@ -56,7 +59,7 @@ class GeogigFeatureTest(unittest.TestCase):
         blame = feature.blame()
         self.assertEqual(8, len(blame))
         attrs = feature.attributes
-        for k,v in blame.items():
+        for k, v in blame.items():
             self.assertTrue(v[0], attrs[k])
 
     def testFeatureType(self):

@@ -1,31 +1,34 @@
 import os
 import time
+import unittest
+import datetime
+
+from geogigpy import geogig
+from geogigpy.osmmapping import OSMMapping, OSMMappingRule
+from geogigpy.geometry import Geometry
 from geogigpy.repo import Repository
 from geogigpy.geogigexception import GeoGigException, GeoGigConflictException
 from geogigpy.commitish import Commitish
 from geogigpy.diff import TYPE_MODIFIED
 from geogigpy.feature import Feature
-import unittest
-from geogigpy import geogig
-from geogigpy.osmmapping import OSMMapping, OSMMappingRule
-import datetime
 from test.testrepo import testRepo
-from geogigpy.geometry import Geometry
+
 
 class GeogigRepositoryTest(unittest.TestCase):
 
     repo = testRepo()
 
     def getTempRepoPath(self):
-        return os.path.join(os.path.dirname(__file__), "temp", str(time.time())).replace('\\', '/')
+        return os.path.join(os.path.dirname(__file__), "temp",
+                            str(time.time())).replace('\\', '/')
 
     def getClonedRepo(self):
         dst = self.getTempRepoPath()
         return self.repo.clone(dst)
 
     def testCreateEmptyRepo(self):
-        repoPath =  self.getTempRepoPath()
-        Repository(repoPath, init = True)
+        repoPath = self.getTempRepoPath()
+        Repository(repoPath, init=True)
 
     def testRevParse(self):
         headid = self.repo.revparse(geogig.HEAD)
@@ -55,7 +58,7 @@ class GeogigRepositoryTest(unittest.TestCase):
         self.assertEqual(4, len(commits))
         self.assertEqual("message_4", commits[0].message)
         self.assertEqual("user", commits[0].authorname)
-        #TODO: add more
+        # TODO: add more
 
     def testLogInBranch(self):
         entries = self.repo.log("conflicted")
@@ -65,7 +68,7 @@ class GeogigRepositoryTest(unittest.TestCase):
         now = datetime.datetime.utcnow()
         commit = self.repo.commitatdate(now)
         log = self.repo.log()
-        #self.assertEquals(log[0].message, commit.message)
+        # self.assertEquals(log[0].message, commit.message)
 
     def testCommitAtWrongDate(self):
         epoch = datetime.datetime.utcfromtimestamp(0)
@@ -76,8 +79,8 @@ class GeogigRepositoryTest(unittest.TestCase):
             self.assertTrue("Invalid date" in e.args[0])
 
     def testLogEmptyRepo(self):
-        repoPath =  self.getTempRepoPath()
-        repo = Repository(repoPath, init = True)
+        repoPath = self.getTempRepoPath()
+        repo = Repository(repoPath, init=True)
         log = repo.log()
         self.assertFalse(log)
 
@@ -98,7 +101,7 @@ class GeogigRepositoryTest(unittest.TestCase):
         self.assertEqual(entries[1].commitid, id)
 
     def testFeaturesAtHead(self):
-        features = self.repo.features(path = "parks")
+        features = self.repo.features(path="parks")
         self.assertEqual(5, len(features))
         feature = features[0]
         self.assertEqual("parks/5", feature.path)
@@ -107,7 +110,7 @@ class GeogigRepositoryTest(unittest.TestCase):
     def testChildren(self):
         children = self.repo.children()
         self.assertEqual(1, len(children))
-        #TODO improve this test
+        # TODO improve this test
 
     def testDiff(self):
         repo = self.getClonedRepo()
@@ -116,15 +119,12 @@ class GeogigRepositoryTest(unittest.TestCase):
         self.assertEqual("parks/5", diffs[0].path)
         self.assertEqual(TYPE_MODIFIED, diffs[0].type())
 
-
     def testDiffWithPath(self):
         repo = self.getClonedRepo()
         diffs = repo.diff("HEAD", "HEAD~3")
         self.assertEqual(2, len(diffs))
         diffs = repo.diff("HEAD", "HEAD~3", "parks/5")
         self.assertEqual(1, len(diffs))
-
-
 
     def testFeatureData(self):
         data = self.repo.featuredata(geogig.HEAD, "parks/1")
@@ -151,7 +151,8 @@ class GeogigRepositoryTest(unittest.TestCase):
         repo = self.getClonedRepo()
         log = repo.log()
         self.assertEqual(4, len(log))
-        path = os.path.join(os.path.dirname(__file__), "data", "shp", "1", "parks.shp")
+        path = os.path.join(os.path.dirname(__file__),
+                            "data", "shp", "1", "parks.shp")
         repo.importshp(path)
         repo.add()
         unstaged = repo.unstaged()
@@ -169,20 +170,21 @@ class GeogigRepositoryTest(unittest.TestCase):
         repo = self.getClonedRepo()
         log = repo.log()
         self.assertEqual(4, len(log))
-        path = os.path.join(os.path.dirname(__file__), "data", "shp", "1", "parks.shp")
+        path = os.path.join(os.path.dirname(__file__),
+                            "data", "shp", "1", "parks.shp")
         repo.importshp(path)
         repo.add()
         unstaged = repo.unstaged()
         self.assertFalse(unstaged)
         staged = repo.staged()
         self.assertTrue(staged)
-        repo.commit("A message with blank spaces\nand a line break")
+        commit_msg = "A message with blank spaces\nand a line break"
+        repo.commit(commit_msg)
         staged = repo.staged()
         self.assertFalse(staged)
         log = repo.log()
         self.assertEqual(5, len(log))
-        self.assertTrue("A message with blank spaces\nand a line break", log[4].message)
-
+        self.assertTrue(commit_msg, log[4].message)
 
     def testCreateReadAndDeleteBranch(self):
         repo = self.getClonedRepo()
@@ -197,15 +199,13 @@ class GeogigRepositoryTest(unittest.TestCase):
         self.assertEqual(3, len(branches))
         self.assertFalse("anewbranch" in branches)
 
-
     def testBlame(self):
         feature = self.repo.feature(geogig.HEAD, "parks/5")
         blame = self.repo.blame("parks/5")
         self.assertEqual(8, len(blame))
         attrs = feature.attributes
-        for k,v in blame.items():
+        for k, v in blame.items():
             self.assertTrue(v[0], attrs[k])
-
 
     def testVersions(self):
         versions = self.repo.versions("parks/5")
@@ -215,7 +215,6 @@ class GeogigRepositoryTest(unittest.TestCase):
         diff = self.repo.featurediff(geogig.HEAD, geogig.HEAD + "~1", "parks/5")
         self.assertEqual(2, len(diff))
         self.assertTrue("area" in diff)
-
 
     def testCreateReadAndDeleteTag(self):
         repo = self.getClonedRepo()
@@ -238,10 +237,11 @@ class GeogigRepositoryTest(unittest.TestCase):
         self.assertEqual(1234.5, attrs["area"])
 
     def testAddFeature(self):
+        nfeats = "parks/newfeature"
         repo = self.getClonedRepo()
         attrs = Feature(repo, geogig.HEAD, "parks/1").attributes
-        repo.insertfeature("parks/newfeature", attrs)
-        newattrs = Feature(repo, geogig.WORK_HEAD, "parks/newfeature").attributes
+        repo.insertfeature(nfeats, attrs)
+        newattrs = Feature(repo, geogig.WORK_HEAD, nfeats).attributes
         self.assertAlmostEqual(attrs["area"], newattrs["area"], 5)
 
     def testRemoveFeature(self):
@@ -284,7 +284,8 @@ class GeogigRepositoryTest(unittest.TestCase):
         conflicts = repo.conflicts()
         self.assertEqual(0, len(conflicts))
         feature = Feature(repo, geogig.WORK_HEAD, "parks/5")
-        self.assertAlmostEqual(feature.attributes["area"], origFeature.attributes["area"], 5)
+        self.assertAlmostEqual(feature.attributes["area"],
+                               origFeature.attributes["area"], 5)
 
     def testSolveConflictOurs(self):
         repo = self.getClonedRepo()
@@ -303,7 +304,8 @@ class GeogigRepositoryTest(unittest.TestCase):
         conflicts = repo.conflicts()
         self.assertEqual(0, len(conflicts))
         feature = Feature(repo, geogig.WORK_HEAD, "parks/5")
-        self.assertEqual(feature.attributes["area"], oursFeature.attributes["area"])
+        self.assertEqual(feature.attributes["area"],
+                         oursFeature.attributes["area"])
 
     def testSolveConflictTheirs(self):
         repo = self.getClonedRepo()
@@ -322,8 +324,8 @@ class GeogigRepositoryTest(unittest.TestCase):
         conflicts = repo.conflicts()
         self.assertEqual(0, len(conflicts))
         feature = Feature(repo, geogig.WORK_HEAD, "parks/5")
-        self.assertEqual(feature.attributes["area"], theirsFeature.attributes["area"])
-
+        self.assertEqual(feature.attributes["area"],
+                         theirsFeature.attributes["area"])
 
     def testIsMerging(self):
         repo = self.getClonedRepo()
@@ -335,7 +337,6 @@ class GeogigRepositoryTest(unittest.TestCase):
         self.assertTrue(repo.ismerging())
         repo.abort()
         self.assertFalse(repo.ismerging())
-
 
     def testIsRebasing(self):
         repo = self.getClonedRepo()
@@ -407,7 +408,7 @@ class GeogigRepositoryTest(unittest.TestCase):
         repo = self.getClonedRepo()
         log = repo.log()
         ref = log[0].ref
-        repo.merge("unconflicted", nocommit = True)
+        repo.merge("unconflicted", nocommit=True)
         self.assertTrue(repo.staged())
         log = repo.log()
         self.assertEqual(ref, log[0].ref)
@@ -444,18 +445,21 @@ class GeogigRepositoryTest(unittest.TestCase):
         self.assertTrue(ref, log[0].ref)
 
     def testOsmImport(self):
-        repoPath =  self.getTempRepoPath()
-        repo = Repository(repoPath, init = True)
-        osmfile = os.path.join(os.path.dirname(__file__), "data", "osm", "ways.xml")
+        repoPath = self.getTempRepoPath()
+        repo = Repository(repoPath, init=True)
+        osmfile = os.path.join(os.path.dirname(__file__),
+                               "data", "osm", "ways.xml")
         repo.importosm(osmfile)
         feature = Feature(repo, geogig.WORK_HEAD, "way/31045880")
         self.assertTrue(feature.exists())
 
     def testOsmImportWithMappingFile(self):
-        repoPath =  self.getTempRepoPath()
-        repo = Repository(repoPath, init = True)
-        osmfile = os.path.join(os.path.dirname(__file__), "data", "osm", "ways.xml")
-        mappingfile = os.path.join(os.path.dirname(__file__), "data", "osm", "mapping.json")
+        repoPath = self.getTempRepoPath()
+        repo = Repository(repoPath, init=True)
+        osmfile = os.path.join(os.path.dirname(__file__),
+                               "data", "osm", "ways.xml")
+        mappingfile = os.path.join(os.path.dirname(__file__),
+                                   "data", "osm", "mapping.json")
         repo.importosm(osmfile, False, mappingfile)
         feature = Feature(repo, geogig.WORK_HEAD, "onewaystreets/31045880")
         self.assertTrue(feature.exists())
@@ -467,19 +471,21 @@ class GeogigRepositoryTest(unittest.TestCase):
         rule.addfield("lit", "lit", geogig.TYPE_STRING)
         rule.addfield("geom", "the_geom", geogig.TYPE_LINESTRING)
         mapping.addrule(rule)
-        repoPath =  self.getTempRepoPath()
-        repo = Repository(repoPath, init = True)
-        osmfile = os.path.join(os.path.dirname(__file__), "data", "osm", "ways.xml")
+        repoPath = self.getTempRepoPath()
+        repo = Repository(repoPath, init=True)
+        osmfile = os.path.join(os.path.dirname(__file__),
+                               "data", "osm", "ways.xml")
         repo.importosm(osmfile, False, mapping)
         feature = Feature(repo, geogig.WORK_HEAD, "onewaystreets/31045880")
         self.assertTrue(feature.exists())
 
-
     def testOsmMapping(self):
-        repoPath =  self.getTempRepoPath()
-        repo = Repository(repoPath, init = True)
-        osmfile = os.path.join(os.path.dirname(__file__), "data", "osm", "ways.xml")
-        mappingfile = os.path.join(os.path.dirname(__file__), "data", "osm", "mapping.json")
+        repoPath = self.getTempRepoPath()
+        repo = Repository(repoPath, init=True)
+        osmfile = os.path.join(os.path.dirname(__file__),
+                               "data", "osm", "ways.xml")
+        mappingfile = os.path.join(os.path.dirname(__file__),
+                                   "data", "osm", "mapping.json")
         repo.importosm(osmfile)
         repo.add()
         repo.commit("message")
@@ -504,7 +510,8 @@ class GeogigRepositoryTest(unittest.TestCase):
     def testPull(self):
         cloned = self.getClonedRepo()
         cloned2 = self.getClonedRepo()
-        path = os.path.join(os.path.dirname(__file__), "data", "shp", "1", "parks.shp")
+        path = os.path.join(os.path.dirname(__file__),
+                            "data", "shp", "1", "parks.shp")
         cloned.importshp(path)
         cloned.addandcommit("new_message")
         cloned2.pull("origin", geogig.MASTER)
@@ -514,7 +521,8 @@ class GeogigRepositoryTest(unittest.TestCase):
     def testPush(self):
         cloned = self.getClonedRepo()
         cloned2 = self.getClonedRepo()
-        path = os.path.join(os.path.dirname(__file__), "data", "shp", "1", "parks.shp")
+        path = os.path.join(os.path.dirname(__file__),
+                            "data", "shp", "1", "parks.shp")
         cloned2.importshp(path)
         cloned2.addandcommit("new_message")
         cloned.push("origin", geogig.MASTER)
@@ -537,7 +545,6 @@ class GeogigRepositoryTest(unittest.TestCase):
         self.assertEqual("message_3", repo.log()[0].message)
         self.assertTrue(len(repo.unstaged()) > 0)
 
-
     def testFeatureType(self):
         repo = self.getClonedRepo()
         ftype = repo.featuretype(geogig.HEAD, "parks")
@@ -547,7 +554,8 @@ class GeogigRepositoryTest(unittest.TestCase):
 
     def testSynced(self):
         repo = self.getClonedRepo()
-        path = os.path.join(os.path.dirname(__file__), "data", "shp", "1", "parks.shp")
+        path = os.path.join(os.path.dirname(__file__),
+                            "data", "shp", "1", "parks.shp")
         repo.importshp(path)
         repo.add()
         unstaged = repo.unstaged()

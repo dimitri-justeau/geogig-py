@@ -1,31 +1,32 @@
-#!/usr/bin/python
-# -*- coding: UTF-8 -*-
 import os
 import time
-from geogigpy.repo import Repository
 import unittest
+
+from geogigpy.repo import Repository
 from geogigpy import geogig
 from geogigpy.geogigexception import GeoGigConflictException
-from test.testrepo import testRepo
 
 
 class GeogigWorkflowTest(unittest.TestCase):
 
     def getTempFolderPath(self):
-        return os.path.join(os.path.dirname(__file__), "temp", str(time.time())).replace('\\', '/')
+        return os.path.join(os.path.dirname(__file__), "temp",
+                            str(time.time())).replace('\\', '/')
 
     def createRepo(self):
-        repopath =  self.getTempFolderPath()
-        repo = Repository(repopath, init = True)
-        shpfile = os.path.join(os.path.dirname(__file__), "data", "shp", "landuse", "landuse2.shp")
+        repopath = self.getTempFolderPath()
+        repo = Repository(repopath, init=True)
+        shpfile = os.path.join(os.path.dirname(__file__),
+                               "data", "shp", "landuse", "landuse2.shp")
         repo.importshp(shpfile, False, "landuse", "fid")
         repo.addandcommit("first")
         return repo
 
     def testImportExportInDifferentFormats(self):
-        repopath =  self.getTempFolderPath()
-        repo = Repository(repopath, init = True)
-        geojsonfile = os.path.join(os.path.dirname(__file__), "data", "geojson", "landuse.geojson")
+        repopath = self.getTempFolderPath()
+        repo = Repository(repopath, init=True)
+        geojsonfile = os.path.join(os.path.dirname(__file__),
+                                   "data", "geojson", "landuse.geojson")
         repo.importgeojson(geojsonfile, False, "landuse", "fid")
         repo.addandcommit("commit")
         shpfile = os.path.join(self.getTempFolderPath(), "landuse.shp")
@@ -34,10 +35,9 @@ class GeogigWorkflowTest(unittest.TestCase):
         unstaged = repo.unstaged()
         self.assertEqual(0, unstaged)
 
-
     def testPushToExistingEmptyRepo(self):
-        repopath =  self.getTempFolderPath()
-        remote = Repository(repopath, init = True)
+        repopath = self.getTempFolderPath()
+        remote = Repository(repopath, init=True)
         local = self.createRepo()
         local.addremote("myremote", repopath)
         local.push("myremote")
@@ -51,18 +51,20 @@ class GeogigWorkflowTest(unittest.TestCase):
         cloneb = repo.clone(clonebpath)
         log = cloneb.log()
         self.assertEqual(1, len(log))
-        shpfile = os.path.join(os.path.dirname(__file__), "data", "shp", "landuse", "landuse3.shp")
+        shpfile = os.path.join(os.path.dirname(__file__),
+                               "data", "shp", "landuse", "landuse3.shp")
         clonea.importshp(shpfile, False, "landuse", "fid")
         clonea.addandcommit("changed attribute value")
         clonea.push("origin")
-        cloneb.pull("origin","master")
+        cloneb.pull("origin", "master")
         log = cloneb.log()
         self.assertEqual(2, len(log))
-        shpfile = os.path.join(os.path.dirname(__file__), "data", "shp", "landuse", "landuse4.shp")
+        shpfile = os.path.join(os.path.dirname(__file__),
+                               "data", "shp", "landuse", "landuse4.shp")
         cloneb.importshp(shpfile, False, "landuse", "fid")
         cloneb.addandcommit("Modifed polygon")
         cloneb.push("origin")
-        clonea.pull("origin","master")
+        clonea.pull("origin", "master")
         log = clonea.log()
         self.assertEqual(3, len(log))
 
@@ -72,7 +74,8 @@ class GeogigWorkflowTest(unittest.TestCase):
         clonea = repo.clone(cloneapath)
         clonebpath = self.getTempFolderPath()
         cloneb = repo.clone(clonebpath)
-        shpfile = os.path.join(os.path.dirname(__file__), "data", "shp", "landuse", "landuse3.shp")
+        shpfile = os.path.join(os.path.dirname(__file__),
+                               "data", "shp", "landuse", "landuse3.shp")
         clonea.importshp(shpfile, False, "landuse", "fid")
         clonea.addandcommit("changed attribute value")
         clonea.push("origin")

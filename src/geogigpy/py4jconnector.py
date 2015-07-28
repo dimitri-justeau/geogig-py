@@ -20,16 +20,18 @@ def setGatewayPort(port):
     global _geogigPort
     _geogigPort = port
 
+
 def _connect():
     global _gateway
     try:
         if _geogigPort is None:
             _gateway = JavaGateway()
         else:
-            _gateway = JavaGateway(GatewayClient(port = int(_geogigPort)))
+            _gateway = JavaGateway(GatewayClient(port=int(_geogigPort)))
         _gateway.entry_point.isGeoGigServer()
     except Exception as e:
         raise Py4JConnectionException()
+
 
 def _javaGateway():
     global _gateway
@@ -37,7 +39,8 @@ def _javaGateway():
         _connect()
     return _gateway
 
-def _runGateway(_commands, url, addcolor = True):
+
+def _runGateway(_commands, url, addcolor=True):
     commands = list(_commands)
     gc.collect()
     if addcolor:
@@ -46,14 +49,16 @@ def _runGateway(_commands, url, addcolor = True):
     command = command.replace("\r", "")
 
     strclass = _javaGateway().jvm.String
-    array = _javaGateway().new_array(strclass,len(commands))
+    array = _javaGateway().new_array(strclass, len(commands))
     for i, c in enumerate(commands):
         array[i] = c
     start = time.clock()
     returncode = _javaGateway().entry_point.runCommand(url, array)
     end = time.clock()
     diff = end - start
-    _logger.debug("Executed " + hidePassword(command)  + " in " + str(diff) + " millisecs")
+    log_msg = "Executed " + hidePassword(command) \
+              + " in " + str(diff) + " millisecs"
+    _logger.debug(log_msg)
     output = [""]
     page = _javaGateway().entry_point.nextOutputPage()
     while page is not None:
@@ -64,18 +69,22 @@ def _runGateway(_commands, url, addcolor = True):
     output = [s.strip("\r\n") for s in output]
     if returncode:
         errormsg = "\n".join(output)
-        _logger.error("Error running command '%s': %s" % (hidePassword(command), errormsg))
+        _logger.error("Error running command '%s': %s"
+                      % (hidePassword(command), errormsg))
         raise GeoGigException("\n".join(output))
 
     return output
+
 
 def hidePassword(command):
     p = re.compile(r"--password \S*")
     return p.sub("--password [PASSWORD_HIDDEN] ", command)
 
+
 def removeProgressListener():
     global _gateway
     _javaGateway().entry_point.removeProgressListener()
+
 
 def setProgressListener(progressFunc, progressTextFunc):
     class Listener(object):
@@ -90,9 +99,12 @@ def setProgressListener(progressFunc, progressTextFunc):
             self.progressTextFunc(s)
 
         class Java:
-            implements = ['org.locationtech.geogig.cli.GeoGigPy4JProgressListener']
+            cls_name = 'org.locationtech.geogig.cli.GeoGigPy4JProgressListener'
+            implements = [cls_name]
 
-    _javaGateway().entry_point.setProgressListener(Listener(progressFunc, progressTextFunc))
+    _javaGateway().entry_point.setProgressListener(Listener(progressFunc,
+                                                            progressTextFunc))
+
 
 def geogigVersion():
     commands = ['--version']
@@ -108,6 +120,7 @@ def geogigVersion():
 class Py4JConnectionException(Exception):
     pass
 
+
 class Py4JCLIConnector(CLIConnector):
     ''' A connector that uses a Py4J gateway server to connect to geogig'''
 
@@ -115,7 +128,7 @@ class Py4JCLIConnector(CLIConnector):
         self.commandslog = []
 
     @staticmethod
-    def clone(url, dest, username = None, password = None):
+    def clone(url, dest, username=None, password=None):
         commands = ['clone', url, dest]
         if username is not None and password is not None:
             commands.extend(["--username", username, "--password", password])
@@ -127,13 +140,13 @@ class Py4JCLIConnector(CLIConnector):
         _runGateway(commands, os.path.dirname(__file__))
 
     @staticmethod
-    def getconfigglobal(param = None):
+    def getconfigglobal(param=None):
         if param is None:
             commands = ['config', '--list', '--global']
             output = _runGateway(commands, os.path.dirname(__file__))
             params = {}
             for line in output:
-                k,v = line.split('=')
+                k, v = line.split('=')
                 params[k] = v
             return params
         else:
@@ -146,13 +159,13 @@ class Py4JCLIConnector(CLIConnector):
 
     def setRepository(self, repo):
         '''
-        Sets the repository to use when later passing commands to this connector using the "run" method
+        Sets the repository to use when later passing commands to this
+        connector using the "run" method
         '''
         self.repo = repo
 
     def checkIsAlive(self):
         _connect()
-
 
     def setGatewayPort(self, port):
         '''

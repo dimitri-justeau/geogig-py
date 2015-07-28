@@ -1,11 +1,14 @@
 from geogigpy.tree import Tree
-import datetime
+
 
 class Commitish(object):
 
-    '''A reference that can be resolved to a commit.
-    This does not store the information of the commit, but it is supposed to serve to perform actual work
-    on that snapshot, like retrieving trees and feature for the version it represents'''
+    '''
+    A reference that can be resolved to a commit.
+    This does not store the information of the commit, but it is supposed
+    to serve to perform actual work on that snapshot, like retrieving trees
+    and feature for the version it represents
+    '''
 
     def __init__(self, repo, ref):
         self.ref = ref
@@ -34,7 +37,10 @@ class Commitish(object):
         self.repo.checkout(self.ref)
 
     def diff(self):
-        '''Returns a list of DiffEntry with all changes introduced by this commitish'''
+        '''
+        Returns a list of DiffEntry with all changes introduced by
+        this commitish
+        '''
         if self._diff is None:
             self._diff = self.repo.diff(self.ref + '~1', self.ref)
         return self._diff
@@ -50,7 +56,6 @@ class Commitish(object):
         if headid == self.id:
             return "Current branch"
         return self.ref
-
 
     def __str__(self):
         return str(self.ref)

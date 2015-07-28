@@ -1,16 +1,19 @@
 import unittest
 import os
 import time
+
 from geogigpy.tree import Tree
 from geogigpy import geogig
 from test.testrepo import testRepo
+
 
 class GeogigTreeTest(unittest.TestCase):
 
     repo = testRepo()
 
     def getTempPath(self):
-        return os.path.join(os.path.dirname(__file__), "temp", str(time.time())).replace('\\', '/')
+        return os.path.join(os.path.dirname(__file__), "temp",
+                            str(time.time())).replace('\\', '/')
 
     def getClonedRepo(self):
         dst = self.getTempPath()
@@ -18,7 +21,8 @@ class GeogigTreeTest(unittest.TestCase):
 
     def testExportShp(self):
         repo = self.getClonedRepo()
-        exportPath = os.path.join(os.path.dirname(__file__), "temp", str(time.time()) + ".shp").replace('\\', '/')
+        exportPath = os.path.join(os.path.dirname(__file__), "temp",
+                                  str(time.time()) + ".shp").replace('\\', '/')
         tree = Tree(repo, geogig.HEAD, "parks")
         tree.exportshp(exportPath)
         self.assertTrue(os.path.exists(exportPath))

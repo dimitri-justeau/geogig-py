@@ -5,7 +5,9 @@ TYPE_MODIFIED = "Modified"
 TYPE_ADDED = "Added"
 TYPE_REMOVED = "Removed"
 
-ATTRIBUTE_DIFF_MODIFIED, ATTRIBUTE_DIFF_ADDED, ATTRIBUTE_DIFF_REMOVED, ATTRIBUTE_DIFF_UNCHANGED = ["M", "A", "R", "U"]
+ATTRIBUTE_DIFF_MODIFIED, ATTRIBUTE_DIFF_ADDED,\
+    ATTRIBUTE_DIFF_REMOVED, ATTRIBUTE_DIFF_UNCHANGED = ["M", "A", "R", "U"]
+
 
 class Diffentry(object):
 
@@ -32,8 +34,9 @@ class Diffentry(object):
             return Feature(self.repo, self.newcommitref, self.path)
 
     def featurediff(self):
-        return self.repo.featurediff(self.oldcommitref, self.newcommitref, self.path)
-
+        return self.repo.featurediff(self.oldcommitref,
+                                     self.newcommitref,
+                                     self.path)
 
     def type(self):
         if self.oldref == NULL_ID:
@@ -49,7 +52,8 @@ class Diffentry(object):
         elif self.newref == NULL_ID:
             return TYPE_REMOVED + " " + self.path
         else:
-            return "%s %s (%s --> %s)" % (TYPE_MODIFIED, self.path, self.oldref, self.newref)
+            return "%s %s (%s --> %s)" % (TYPE_MODIFIED, self.path,
+                                          self.oldref, self.newref)
 
 
 

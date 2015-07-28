@@ -1,6 +1,7 @@
 from geogigpy.geogigexception import GeoGigException
 from geogigpy.geometry import Geometry
 
+
 class Feature(object):
 
     def __init__(self, repo, ref, path):
@@ -15,8 +16,8 @@ class Feature(object):
         '''
         Returns the attributes of the feature in a dict  with attributes
         names as keys and attribute values as values.
-        Values are converted to appropriate types when possible, otherwise they are stored
-        as the string representation of the attribute
+        Values are converted to appropriate types when possible, otherwise
+        they are stored as the string representation of the attribute
         '''
         if self._attributes is None:
             self.query()
@@ -24,9 +25,13 @@ class Feature(object):
 
     @property
     def attributesnogeom(self):
-        '''Returns a filtered set of attributes, with only those attributes that are not geometries'''
+        '''
+        Returns a filtered set of attributes, with only those attributes
+        that are not geometries
+        '''
         attrs = self.attributes
-        return dict((i for i in attrs.items() if not isinstance(i[1], Geometry) ))
+        return dict((i for i in attrs.items()
+                     if not isinstance(i[1], Geometry)))
 
     @property
     def geom(self):
@@ -58,10 +63,10 @@ class Feature(object):
 
     def featuretype(self):
         '''
-        returns the feature type definition of the feature in a dict  with attributes
-        names as keys and attribute type names as values.
-        Values are converted to appropriate types when possible, otherwise they are stored
-        as the string representation of the attribute
+        returns the feature type definition of the feature in a dict
+        with attributes names as keys and attribute type names as values.
+        Values are converted to appropriate types when possible, otherwise
+        they are stored as the string representation of the attribute
         '''
         if self._featuretype is None:
             self.query()
@@ -69,15 +74,17 @@ class Feature(object):
 
     def diff(self, feature):
         if feature.path != self.path:
-            raise GeoGigException("Cannot compare feature with different path")
+            msg = "Cannot compare feature with different path"
+            raise GeoGigException(msg)
         return self.repo.featurediff(self.ref, feature.ref, self.path)
 
     def query(self):
         data = self.repo.featuredata(self.ref, self.path)
         if len(data) == 0:
-            raise GeoGigException("Feature at the specified path does not exist")
-        self._attributes = dict(( (k, v[0]) for k,v in data.items()))
-        self._featuretype = dict(( (k, v[1]) for k,v in data.items()))
+            msg = "Feature at the specified path does not exist"
+            raise GeoGigException(msg)
+        self._attributes = dict(((k, v[0]) for k, v in data.items()))
+        self._featuretype = dict(((k, v[1]) for k, v in data.items()))
 
     def exists(self):
         try:
@@ -97,20 +104,25 @@ class Feature(object):
     def versions(self):
         '''
         Returns all versions of this feature.
-        It returns a dict with Commit objects as keys, and feature data for the corresponding
-        commit as values. Feature data is another dict with attributes
-        names as keys and tuples of (attribute_value, attribute_type_name) as values.
-        Values are converted to appropriate types when possible, otherwise they are stored
-        as the string representation of the attribute
+        It returns a dict with Commit objects as keys,
+        and feature data for the corresponding commit as values.
+        Feature data is another dict with attributes names as keys
+        and tuples of (attribute_value, attribute_type_name) as values.
+        Values are converted to appropriate types when possible,
+        otherwise they are stored as the string representation of the attribute
         '''
         return self.repo.versions(self.path)
 
     def setascurrent(self):
-        '''Sets this version of the feature as the current one in the working tree and index'''
+        '''
+        Sets this version of the feature as the current one in the
+        working tree and index
+        '''
         if self.exists():
             self.repo.updatepathtoref(self.ref, [self.path])
         else:
-            raise GeoGigException("Feature at the specified path does not exist")
+            msg = "Feature at the specified path does not exist"
+            raise GeoGigException(msg)
 
     def __str__(self):
         return self.ref + ":" + self.path

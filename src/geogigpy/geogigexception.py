@@ -1,8 +1,10 @@
 class GeoGigException(Exception):
     pass
 
+
 class UnconfiguredUserException(Exception):
     pass
+
 
 class InterruptedOperationException(Exception):
     '''
@@ -11,6 +13,7 @@ class InterruptedOperationException(Exception):
     conflicts
     '''
     pass
+
 
 class GeoGigConflictException(InterruptedOperationException):
     pass

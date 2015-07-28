@@ -11,7 +11,8 @@ class Commit(Commitish):
 
     ''' A geogig commit'''
 
-    def __init__(self, repo, commitid, treeid, parents, message, authorname, authordate, committername, committerdate):
+    def __init__(self, repo, commitid, treeid, parents, message,
+                 authorname, authordate, committername, committerdate):
         Commitish.__init__(self, repo, commitid)
         self.repo = repo
         self.commitid = commitid
@@ -34,14 +35,17 @@ class Commit(Commitish):
         else:
             if (repo.url, ref) not in Commit._commitcache:
                 id = repo.revparse(ref)
-                log = repo.log(id, n = 1)
+                log = repo.log(id, n=1)
                 Commit._commitcache[(repo.url, ref)] = log[0]
             return Commit._commitcache[(repo.url, ref)]
 
     @property
     def parents(self):
-        '''Returns a list of commits with commits representing the parents of this commit'''
-        commits =  [self.fromref(self.repo, p) for p in self._parents]
+        '''
+        Returns a list of commits with commits representing the parents of
+        this commit
+        '''
+        commits = [self.fromref(self.repo, p) for p in self._parents]
         return commits
 
     @property
@@ -52,15 +56,21 @@ class Commit(Commitish):
         '''
         return self.parents[0]
 
-    def diff(self, path = None):
-        '''Returns a list of DiffEntry with all changes introduced by this commitish'''
+    def diff(self, path=None):
+        '''
+        Returns a list of DiffEntry with all changes introduced
+        by this commitish
+        '''
         if self._diff is None:
             self._diff = self.repo.diff(self.parent.ref, self.ref, path)
         return self._diff
 
     def difftreestats(self):
-        '''Returns a dict with tree changes statistics for the passed refs. Keys are paths, values are tuples
-        in the form  (added, deleted, modified) corresponding to changes made to that path'''
+        '''
+        Returns a dict with tree changes statistics for the passed refs. Keys
+        are paths, values are tuples in the form (added, deleted, modified)
+        corresponding to changes made to that path
+        '''
         return self.repo.difftreestats(self.parent.ref, self.ref)
 
     def humantext(self):
@@ -69,7 +79,9 @@ class Commit(Commitish):
         if headid == self.id:
             return "Current last commit"
         epoch = time.mktime(self.committerdate.timetuple())
-        offset = datetime.datetime.fromtimestamp (epoch) - datetime.datetime.utcfromtimestamp (epoch)
+        t1 = datetime.datetime.fromtimestamp(epoch)
+        t2 = datetime.datetime.utcfromtimestamp(epoch)
+        offset = t1 - t2
         d = self.committerdate + offset
         return self.message + d.strftime(" (%m/%d/%y %H:%M)")
 
@@ -81,7 +93,7 @@ class Commit(Commitish):
 
     def __str__(self):
         try:
-            msg = str(self.message, errors = "ignore")
+            msg = str(self.message, errors="ignore")
         except TypeError:
             msg = self.message
         s = "id " + self.commitid + "\n"
