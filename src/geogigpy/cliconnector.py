@@ -597,8 +597,8 @@ class CLIConnector(Connector):
     def cat(self, reference):
         return "\n".join(self.run(["cat", reference]))
 
-    def parseattribs(self, lines):
-        attributes = {}
+    def parseattribs(self, lines, ordered=True):
+        attributes = OrderedDict() if ordered else {}
         iterator = iter(lines)
         while True:
             try:

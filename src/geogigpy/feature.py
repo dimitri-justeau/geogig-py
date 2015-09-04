@@ -1,5 +1,7 @@
 # coding: utf-8
 
+from collections import OrderedDict
+
 from geogigpy.geogigexception import GeoGigException
 from geogigpy.geometry import Geometry
 
@@ -80,13 +82,14 @@ class Feature(object):
             raise GeoGigException(msg)
         return self.repo.featurediff(self.ref, feature.ref, self.path)
 
-    def query(self):
+    def query(self, ordered=True):
         data = self.repo.featuredata(self.ref, self.path)
         if len(data) == 0:
             msg = "Feature at the specified path does not exist"
             raise GeoGigException(msg)
-        self._attributes = dict(((k, v[0]) for k, v in data.items()))
-        self._featuretype = dict(((k, v[1]) for k, v in data.items()))
+        dict_cls = OrderedDict if ordered else dict
+        self._attributes = dict_cls(((k, v[0]) for k, v in data.items()))
+        self._featuretype = dict_cls(((k, v[1]) for k, v in data.items()))
 
     def exists(self):
         try:
