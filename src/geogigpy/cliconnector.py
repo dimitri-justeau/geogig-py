@@ -6,6 +6,7 @@ import tempfile
 import logging
 from copy import deepcopy
 import datetime
+from collections import OrderedDict
 
 from geogigpy import geogig
 from geogigpy.feature import Feature
@@ -657,11 +658,11 @@ class CLIConnector(Connector):
             features[name] = self.parseattribs(lines)
         return features
 
-    def featuretype(self, ref, tree):
+    def featuretype(self, ref, tree, ordered=True):
         show = self.show(ref + ":" + tree)
         ftypeid = show.splitlines()[3].split(" ")[-1]
         show = self.show(ftypeid)
-        attribs = {}
+        attribs = OrderedDict() if ordered else {}
         for line in show.splitlines()[3:]:
             tokens = line.split(":")
             attribs[tokens[0]] = tokens[1].strip()[1:-1]
