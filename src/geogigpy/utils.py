@@ -25,15 +25,15 @@ def prettydate(d):
     if diff.days == 1:
         s = "1 day ago"
     elif diff.days > 1:
-        s = "{} days ago".format(diff.days)
+        s = "{} days ago".format(int(diff.days))
     elif secs < 120:
         s = "1 minute ago"
     elif secs < 3600:
-        s = "{} minutes ago".format(secs/60)
+        s = "{} minutes ago".format(int(secs/60))
     elif secs < 7200:
         s = "1 hour ago"
     else:
-        s = '{} hours ago'.format(secs/3600)
+        s = '{} hours ago'.format(int(secs/3600))
 
     epoch = time.mktime(d.timetuple())
     t1 = datetime.datetime.fromtimestamp(epoch)
