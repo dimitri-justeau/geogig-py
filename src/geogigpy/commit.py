@@ -80,7 +80,7 @@ class Commit(Commitish):
         """Returns a nice human-readable description of the commit"""
         headid = self.repo.revparse(self.repo.head.ref)
         if headid == self.id:
-            return "Current last commit"
+            return "{} (Current last commit)".format(self.message)
         epoch = time.mktime(self.committerdate.timetuple())
         t1 = datetime.datetime.fromtimestamp(epoch)
         t2 = datetime.datetime.utcfromtimestamp(epoch)
