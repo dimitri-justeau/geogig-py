@@ -3,6 +3,7 @@
 import tempfile
 import datetime
 import re
+import shutil
 
 from geogigpy.commitish import Commitish
 from geogigpy.tag import Tag
@@ -289,6 +290,15 @@ class Repository(object):
         url = self.url.replace('\\', '/')
         self.connector.clone(url, path)
         return Repository(path, self.connector.__class__(), False)
+
+    def local_clone(self, path):
+        """
+        Clone this repo locally on the system, copying the repo folder.
+        Returns a reference to the cloned repo.
+        """
+        shutil.copytree(self.url, path)
+        cloned = Repository(path)
+        return cloned
 
     def createbranch(self, ref, name, force=False, checkout=False):
         """
