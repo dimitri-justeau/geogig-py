@@ -38,7 +38,7 @@ class Connector(object):
     def children(self, ref, path, recursive):
         raise NotImplementedError
 
-    def addremote(self, name, url, username, password):
+    def addremote(self, name, url, username=None, password=None):
         raise NotImplementedError
 
     def removeremote(self, name):

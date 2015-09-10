@@ -659,7 +659,7 @@ class Repository(object):
         """
         return self.connector.remotes()
 
-    def addremote(self, name, url, username, password):
+    def addremote(self, name, url, username=None, password=None):
         """Adds a new remote"""
         self.connector.addremote(name, url, username, password)
 
